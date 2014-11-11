@@ -8,7 +8,7 @@ var assert				= require('assert')
 
 
 describe('Module coroutine', function() {
-
+/*
 	it('case 1 normal execute', function(done) {
 
 		var old = console.showError
@@ -238,4 +238,59 @@ describe('Module coroutine', function() {
 		})
 
 	})
+*/
+
+	it('case 9 deep coroutine', function(done) {
+
+		var Delta = Class.inherit({
+
+			onCreate: function(eventCallback) {
+				this.eventCallback = eventCallback
+			},
+
+			apply: function(items, callback) {
+				this.gen_apply(this, items, callback)
+			},
+
+			gen_apply: coroutine(function*(delta, items, g) {
+
+				console.log('a 1')
+				yield delta.eventCallback(g.resume)
+				console.log('a 2')
+
+				// yield delta.eventCallback(g.resume)
+				// console.log('a 3')
+
+				return true
+
+			})
+
+		})
+
+		var d = Delta.create(function(callback) {
+			console.log('d 1')
+			process.nextTick(callback)
+			//callback()
+			console.log('d 2')
+		})
+
+		coroutine(function*(g) {
+
+			console.log(1)
+
+			yield d.apply({}, g.resume)
+
+			console.log(2)
+
+
+		})(function(err, result) {
+
+			console.log('main done')
+			console.log(util.inspect([err, result], {depth:null}))
+
+			 done()
+		})
+
+	})
+
 })
