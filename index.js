@@ -177,6 +177,23 @@ function coroutine(generatorConstructor
 */
 )
 		generatorObject.next()
+
+		return generatorObject
+	}
+}
+
+coroutine.method = function(generatorConstructor) {
+
+	return function() {
+
+		var args = Array.prototype.slice.call(arguments)
+		args.unshift(this)
+
+		var generatorObject = new Generator(generatorConstructor, args)
+
+		generatorObject.next()
+
+		return generatorObject
 	}
 }
 
